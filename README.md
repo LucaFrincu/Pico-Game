@@ -1,2 +1,2 @@
 # Pico Game
- Pico8 Web Dev game
+ Pico8 game about a worm.
