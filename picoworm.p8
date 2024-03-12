@@ -2,6 +2,8 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 x, y = 64, 64
+ax, ay = 0, 0
+vx, vy = 0, 0
 
 hist_x = {}
 hist_y = {}
@@ -12,14 +14,38 @@ function _draw()
 	for i=1,10 do
 		circ(hist_x[i],hist_y[i],i+2,i)
 	end
-	print(#hist_x..' '..hist_x[1])
+	print(ax..' '..ay)
+	print(vx..' '..vy)
 end
 
 function _update()
-	if (btn(⬆️)) y-=3
-	if (btn(⬇️)) y+=3
-	if (btn(⬅️)) x-=3
-	if (btn(➡️)) x+=3
+	ay = 0
+	if (btn(⬆️)) ay=-6 
+	if (btn(⬇️)) ay=1.5
+	if (btn(⬅️)) ax=-1.5
+	if (btn(➡️)) ax=1.5
+	
+	if ax > 0 then ax = ax-0.2 end
+	if ax < 0 then ax = ax+0.2 end
+	ay = ay + 0.9 --gravity
+	
+	vx = vx + ax * 0.1
+	vy = vy + ay * 0.1
+	
+
+--	if vx < 3 then vx = 3 end
+--if vx > -3 then vx = -3 end
+--if vy < 3 then vy = 3 end
+--	if vy > -3 then vy = -3 end
+	
+	x = x + vx
+	y = y + vy
+	
+	x = x % 128
+	if y > 120 then 
+		y = 120
+		vy = 0 
+	end
 	
 	add(hist_x, x)
 	add(hist_y, y)
