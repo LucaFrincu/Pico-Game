@@ -16,6 +16,8 @@ end
 function _draw()
 cls()
 
+camera_follow()
+
 map()
 
 	for i=1,10 do
@@ -48,9 +50,8 @@ function _update()
 	x = x + vx
 	y = y + vy
 	
-	x = x % 128
-	if y > 120 then 
-		y = 120
+	if y > 26 * 8 then 
+		y = 26 * 8
 		vy = 0 
 	end
 	
@@ -68,6 +69,18 @@ player = {}
 player.x=16
 player.y=16
 
+end
+-->8
+function camera_follow()
+
+ cam_x=x-60
+ cam_y=y-60
+
+ cam_x=mid(0,cam_x,896)
+ cam_y=mid(0,cam_y,128)
+ 
+ camera(cam_x,cam_y)
+ 
 end
 __gfx__
 0000008800880000080000004444444444444444555555555555555500000000000000000000000000000000343633433333333344444444cccccccccccccccc
