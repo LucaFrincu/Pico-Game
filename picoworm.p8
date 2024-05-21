@@ -24,21 +24,20 @@ function _draw()
 
     map()
 
-    -- draw the tail with sprite 81
     for i=1, #hist_x do
         spr(81, hist_x[i], hist_y[i])
     end
 
-    -- draw main character's head with sprite 82
+    -- head 
     spr(82, x, y)
 
-    -- draw npc with sprite 74
+    -- npc 
     spr(74, npc_x, npc_y)
 
 end
 
 function _update()
-    -- update main character position
+    
     ay = 0
     if (btn(⬆️)) ay=-5 
     if (btn(⬇️)) ay=5
@@ -52,23 +51,30 @@ function _update()
     vx = vx + ax * 0.1
     vy = vy + ay * 0.1
 
-    -- store current position before updating
     add(hist_x, x)
     add(hist_y, y)
     if (#hist_x > 10) then
         deli(hist_x, 1)
         deli(hist_y, 1)
     end
-
+				--bottom border
     x = x + vx
     y = y + vy
 
     if y > 26 * 8 then 
         y = 26 * 8
         vy = 0 
+        
+    end
+    
+    --top border
+    if y < 2 * 8 then
+    y = 2 * 8
+    vy = 0
+    
     end
 
-    -- update npc position
+    -- npc position
     npc_timer = npc_timer + 1
     if npc_timer >= 30 then -- 30 frames ~ 1 second
         npc_timer = 0
