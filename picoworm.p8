@@ -1,6 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+-- main game variables
 x, y = 64, 64
 ax, ay = 0, 0
 vx, vy = 0, 0
@@ -9,17 +10,41 @@ hist_x = {}
 hist_y = {}
 
 npc_x, npc_y = 32, 32
-npc_dir = 1
-npc_steps = 0
+npc_exists = true
 npc_timer = 0
 
-function _init()
+countdown = 10 -- start with 10 seconds countdown
+game_state = "menu" -- start with the main menu
 
+function _init()
+    -- set initial countdown time
+    countdown = 10
+    spawn_npc()
 end
 
 function _draw()
     cls()
+    
+    if game_state == "menu" then
+        draw_menu()
+    elseif game_state == "game" then
+        draw_game()
+    elseif game_state == "end" then
+        draw_end()
+    end
+end
 
+function _update()
+    if game_state == "menu" then
+        update_menu()
+    elseif game_state == "game" then
+        update_game()
+    elseif game_state == "end" then
+        update_end()
+    end
+end
+
+function draw_game()
     camera_follow()
 
     map()
@@ -28,16 +53,20 @@ function _draw()
         spr(81, hist_x[i], hist_y[i])
     end
 
-    -- head 
+    -- draw main character's head with sprite 82
     spr(82, x, y)
 
-    -- npc 
-    spr(74, npc_x, npc_y)
+    -- draw npc with sprite 74
+    if npc_exists then
+        spr(74, npc_x, npc_y)
+    end
 
+    -- draw the countdown timer on screen coordinates
+    camera(0, 0) -- reset camera to draw hud
+    print("time: "..flr(countdown), 0, 0, 7)
 end
 
-function _update()
-    
+function update_game()
     ay = 0
     if (btn(⬆️)) ay=-5 
     if (btn(⬇️)) ay=5
@@ -57,79 +86,60 @@ function _update()
         deli(hist_x, 1)
         deli(hist_y, 1)
     end
-    
-				--bottom border
+
+    -- update position
     x = x + vx
     y = y + vy
 
+    -- check bottom boundary
     if y > 26 * 8 then 
         y = 26 * 8
         vy = 0 
-        
     end
     
-    --top border
+    -- check top boundary
     if y < 2 * 8 then
-    y = 2 * 8
-    vy = 0
-    
+        y = 2 * 8
+        vy = 0
     end
     
-    --left border
+    -- check left boundary
     if x < 2 * 8 then
-    x = 2 * 8
-    vx = 0
-    
+        x = 2 * 8
+        vx = 0
     end
     
-    --right border
-				if x > 43 * 8 then
-				x = 43 * 8
-				vx = 0
-				
-				end
-				
-    -- npc position
-    npc_timer = npc_timer + 1
-    if npc_timer >= 30 then -- 30 frames ~ 1 second
-        npc_timer = 0
-        npc_steps = npc_steps + 1
-        if npc_dir == 1 then
-            npc_x = npc_x + 2
-        elseif npc_dir == 2 then
-            npc_x = npc_x - 2
-        elseif npc_dir == 3 then
-            npc_y = npc_y - 2
-        end
-        
-        if npc_steps == 5 then
-            npc_steps = 0
-            npc_dir = npc_dir + 1
-            if npc_dir > 3 then npc_dir = 1 end
-        end
+    -- check right boundary
+    if x > 43 * 8 then
+        x = 43 * 8
+        vx = 0
     end
 
-    -- ensure npc stays within map boundaries
-    if npc_x < 0 then npc_x = 0 end
-    if npc_x > 43 * 8 then npc_x = 43 * 8 end
-    if npc_y < 2 * 8 then npc_y = 2 * 8 end
-    if npc_y > 25 * 8 then npc_y = 25 * 8 end
+    -- check collision with npc
+    if npc_exists and abs(x - npc_x) < 8 and abs(y - npc_y) < 8 then
+        npc_exists = false
+        countdown = countdown + 3
+        spawn_npc()
+    end
+
+    -- update countdown timer
+    countdown = countdown - (1 / 30) -- assuming _update() is called 30 times per second
+    if countdown < 0 then
+        countdown = 0 -- prevent the timer from going negative
+        game_state = "end" -- switch to end state when time is up
+    end
 end
 
-
+function spawn_npc()
+    npc_x = flr(rnd(43 * 8))
+    npc_y = flr(rnd(24 * 8)) + 2 * 8
+    npc_exists = true
+end
 
 function camera_follow()
-    
+    -- placeholder for camera follow logic
 end
 
--->8
-function initplayer()
-
-player = {}
-player.x=16
-player.y=16
-
-end
 -->8
 function camera_follow()
 
@@ -142,6 +152,50 @@ function camera_follow()
  camera(cam_x,cam_y)
  
 end
+-->8
+function draw_menu()
+    -- draw the main menu
+    print("main menu", 44, 30, 7)
+    print("press ❎ to start", 36, 50, 7)
+end
+
+function update_menu()
+    if btnp(❎) then -- ❎ button
+        game_state = "game"
+    end
+end
+
+function draw_end()
+    -- draw the end screen
+    print("you died of hunger", 34, 30, 7)
+    print("press ❎ to restart", 32, 50, 7)
+end
+
+function update_end()
+    if btnp(❎) then -- ❎ button
+        restart_game()
+    end
+end
+
+function restart_game()
+    -- reset the game state and variables
+    x, y = 64, 64
+    ax, ay = 0, 0
+    vx, vy = 0, 0
+
+    hist_x = {}
+    hist_y = {}
+
+    npc_x, npc_y = 32, 32
+    npc_exists = true
+    npc_timer = 0
+
+    countdown = 10 -- reset countdown timer
+    game_state = " game" -- go back to game state
+
+    spawn_npc()
+end
+
 __gfx__
 0000000000000000000000004444444444444444555555555555555500000000000000000000000000000000343633433333333344444444cccccccccccccccc
 000000000000000000000000444444363634444455555555555555550000000000000000000000000000000063943694f3f33f3344444444cccccccccccccccc
