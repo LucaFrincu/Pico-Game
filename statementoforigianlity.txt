@@ -1,0 +1,93 @@
+name: Frincu Luca
+
+declaration: >-
+  I declare that everything I have submitted in this assignment is entirely my
+  own work, with the following exceptions:
+      
+
+====================================================================
+code: 	sfx(01)
+	sfx(00)
+
+    url:https://www.youtube.com/watch?v=BykpKqa2ZNU
+====================================================================   
+code: 	hist_x = {}
+	hist_y = {}
+	ay = 0
+
+    if ax > 0 then ax = ax-0.1 end
+    if ax < 0 then ax = ax+0.1 end
+    ay = ay + 0.3 -- gravity
+
+    vx = vx + ax * 0.1
+    vy = vy + ay * 0.1
+
+    add(hist_x, x)
+    add(hist_y, y)
+    if (#hist_x > 10) then
+        deli(hist_x, 1)
+        deli(hist_y, 1)
+    end
+
+    -- update position
+    x = x + vx
+    y = y + vy
+
+
+author: history_trace.p8
+
+====================================================================
+code: 	game_state = "menu"
+	
+function _draw()
+    cls()
+    
+    if game_state == "menu" then
+        draw_menu()
+        
+    elseif game_state == "game" then
+        draw_game()
+  
+    elseif game_state == "end" then
+        draw_end()
+    end
+end
+
+function _update()
+    if game_state == "menu" then
+        update_menu()
+    elseif game_state == "game" then
+        update_game()
+    elseif game_state == "end" then
+        update_end()
+    end
+end
+
+author: Nerdy Teachers
+link:	https://www.youtube.com/watch?v=nu2Ief1KYsU&t=138s
+
+====================================================================
+link: https://pico-8.fandom.com/wiki/Map
+
+For drawing the map
+	map()
+====================================================================
+For debugging
+
+link: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjSs9eg8sKGAxXMhf0HHWSAELwQFnoECAcQAQ&url=https%3A%2F%2Fchat.openai.com%2F&usg=AOvVaw139HWUX4D802zbDuJCdFg9&opi=89978449
+
+====================================================================
+code: function camera_follow()
+
+ 	cam_x=x-60
+ 	cam_y=y-60
+
+ 	cam_x=mid(0,cam_x,896)
+ 	cam_y=mid(0,cam_y,128)
+ 
+ 	camera(cam_x,cam_y)
+ 
+	end
+
+author: MBoffin (Dylan Bennett)
+link: https://mboffin.itch.io/pico8-camera-follow
