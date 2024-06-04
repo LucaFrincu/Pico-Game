@@ -130,7 +130,7 @@ function update_game()
     end
 
     -- update countdown timer
-    countdown = countdown - (1 / 30) -- assuming _update() is called 30 times per second
+    countdown = countdown - (1 / 30) -- 30 times per second
     if countdown < 0 then
         countdown = 0 
         sfx(00)
@@ -164,7 +164,7 @@ end
 -->8
 function draw_menu()
     -- draw the background
-    rectfill(0, 0, 127, 127, 1) -- draw a rectangle from (0, 0) to (127, 127) with color 1 (dark blue)
+    rectfill(0, 0, 127, 127, 1)
     
     -- draw the main menu text
     print("main menu", 44, 30, 3)
