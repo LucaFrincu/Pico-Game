@@ -1,24 +1,26 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
--- main game variables
-x, y = 64, 64
+--player start position
+x, y = 145, 20
+
+--acceleration
 ax, ay = 0, 0
+
+--velocity
 vx, vy = 0, 0
 
 hist_x = {}
 hist_y = {}
 
-npc_x, npc_y = 32, 32
 npc_exists = true
-npc_timer = 0
-
-countdown = 10 -- start with 10 seconds countdown
-game_state = "menu" -- start with the main menu
+npc_timer = 0 
+game_state = "menu"
+npc_eaten_count = 0 
 
 function _init()
-    -- set initial countdown time
-    countdown = 10
+    -- 15 seconds life
+    countdown = 15
     spawn_npc()
 end
 
@@ -49,21 +51,22 @@ function draw_game()
 
     map()
 
+    -- tail
     for i=1, #hist_x do
         spr(81, hist_x[i], hist_y[i])
     end
 
-    -- draw main character's head with sprite 82
+    -- head 
     spr(82, x, y)
 
-    -- draw npc with sprite 74
+    -- bug npc
     if npc_exists then
         spr(74, npc_x, npc_y)
     end
 
-    -- draw the countdown timer on screen coordinates
-    camera(0, 0) -- reset camera to draw hud
-    print("time: "..flr(countdown), 0, 0, 7)
+    -- countdown timer coordinates
+    camera(0, 0)  
+    print("time: "..flr(countdown), 0, 0, 1)
 end
 
 function update_game()
@@ -119,14 +122,15 @@ function update_game()
     if npc_exists and abs(x - npc_x) < 8 and abs(y - npc_y) < 8 then
         npc_exists = false
         countdown = countdown + 3
+        npc_eaten_count = npc_eaten_count + 1 -- increment the counter
         spawn_npc()
     end
 
     -- update countdown timer
     countdown = countdown - (1 / 30) -- assuming _update() is called 30 times per second
     if countdown < 0 then
-        countdown = 0 -- prevent the timer from going negative
-        game_state = "end" -- switch to end state when time is up
+        countdown = 0 
+        game_state = "end" 
     end
 end
 
@@ -137,10 +141,11 @@ function spawn_npc()
 end
 
 function camera_follow()
-    -- placeholder for camera follow logic
+    
 end
 
 -->8
+-- camera follow script
 function camera_follow()
 
  cam_x=x-60
@@ -154,31 +159,38 @@ function camera_follow()
 end
 -->8
 function draw_menu()
-    -- draw the main menu
-    print("main menu", 44, 30, 7)
-    print("press ❎ to start", 36, 50, 7)
+    -- draw the background
+    rectfill(0, 0, 127, 127, 1) -- draw a rectangle from (0, 0) to (127, 127) with color 1 (dark blue)
+    
+    -- draw the main menu text
+    print("main menu", 44, 30, 3)
+    print("press ❎ to start", 36, 50, 8)
 end
 
 function update_menu()
-    if btnp(❎) then -- ❎ button
+    if btnp(❎) then
         game_state = "game"
     end
 end
 
 function draw_end()
-    -- draw the end screen
-    print("you died of hunger", 34, 30, 7)
+    -- draw the background
+    rectfill(0, 0, 127, 127, 1) 
+    
+    -- end screen text
+    print("you died of hunger", 34, 30, 8)
+    print("you ate "..npc_eaten_count.." bugs", 34, 40, 2)
     print("press ❎ to restart", 32, 50, 7)
 end
 
 function update_end()
-    if btnp(❎) then -- ❎ button
+    if btnp(❎) then 
         restart_game()
     end
 end
 
 function restart_game()
-    -- reset the game state and variables
+    -- reset variables to default
     x, y = 64, 64
     ax, ay = 0, 0
     vx, vy = 0, 0
@@ -190,8 +202,9 @@ function restart_game()
     npc_exists = true
     npc_timer = 0
 
-    countdown = 10 -- reset countdown timer
-    game_state = " game" -- go back to game state
+    npc_eaten_count = 0 
+    countdown = 15 
+    game_state = "game" 
 
     spawn_npc()
 end
